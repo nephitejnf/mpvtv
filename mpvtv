@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# Current working MENU options: 'dmenu' 'slmenu' 'rofi -dmenu' 
+MENU='dmenu -i -l 15'
+
+PLAYLIST=$(echo -e "Category\nCountry\nLanguage" | $MENU -p "Select a channel list by:")
+
+case $PLAYLIST in
+    "Category") PLAYLIST="$HOME/.config/mpvtv/channel-lists/cat-iptv.csv" ;;
+    "Country")  PLAYLIST="$HOME/.config/mpvtv/channel-lists/country-iptv.csv" ;;
+    "Language") PLAYLIST="$HOME/.config/mpvtv/channel-lists/lang-iptv.csv" ;;
+esac
+
+CHANNELS=$(awk 'BEGIN {FS=","};{print $1}' $PLAYLIST | $MENU -p "Which playlist?" | grep -f- $PLAYLIST | awk 'BEGIN {FS=","};{print $2}')
+
+mpv --script-opts=iptv=1 $CHANNELS
